@@ -1,0 +1,136 @@
+﻿@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Technical Details</h2>
+
+<h3>Remark: </h3>
+<p>
+    Back-End and Front-end applications are two different applications that could/should be built, deployed and executed separetely.
+    For this test, both .Net applications are in the same project to simplify the overall code and development. In real projects, both applications should be in separated projects.
+</p>
+
+<h3>Back-End: </h3>
+<ul>
+    <li>.Net ASP core 2.1 Web API</li>
+    <li>Responsibility: Perform CRUD operations in DB for User Entity</li>
+    <li>Data Model: RegisteredUser containing the required attributes</li>
+    <pre><code class="Csharp">
+    public class RegisteredUser
+    {
+    public Guid Id { get; set; }
+    public string Email { get; set; }
+    public string Name { get; set; }
+    [DataType(DataType.Date)]
+    [DisplayName("Date of birth")]
+    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
+    public DateTime? DateOfBirth { get; set; } = null;
+    [DataType(DataType.Password)]
+    public string Password { get; set; }
+    [StringLength(1024)]
+    public string AdditionalInfo s{ get; set; }
+    }
+        </code></pre>
+    <li>API methods provided by the Controller: UserApiController</li>
+    <ul>
+        <li>GET api/users?name=WWWW&email=XXX&max=ZZZ: Provide at most 'max' RegisteredUser users whose email contains 'XXX' and name contains 'WWW'</li>
+        <li>
+            GET api/users/id: Provide RegisteredUser with the right id
+        </li>
+        <li>
+            POST api/users Body(RegisteredUser): Create the RegisteredUser in DB
+        </li>
+    </ul>
+    <pre><code class="Csharp">
+    ...
+    [Route("api/users")]
+    [ApiController]
+    public class UserApiController : ControllerBase
+    ...
+    [HttpGet]
+    public async Task<IActionResult> GetUserModel([FromQuery] UserFiltering userFiltering = null)
+    {
+    ...
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetUserModel(Guid id)
+    {
+    ...
+    [HttpPost]
+    public async Task<IActionResult> PostUserModel(RegisteredUser registeredUser)
+    {
+    ...
+    </code></pre>
+    <li>ORM: Entity Framework</li>
+    <pre><code class="Csharp">
+    ...
+    services.AddDbContext<BalticAmadeusTaskContext>(options =>
+        options.UseSqlServer(Configuration.GetConnectionString("BalticAmadeusTaskContext")));
+    ...     
+    </code></pre>
+
+    <li>Model validation: FluentValidation (https://fluentvalidation.net/)</li>
+    <pre><code class="Csharp">
+    ...
+    RuleFor(x => x.Name)
+    .NotEmpty()
+    .WithMessage("Name is mandatory.")
+    .MaximumLength(50);
+
+    RuleFor(x => x.Password)
+    .Cascade(CascadeMode.StopOnFirstFailure)
+    .NotEmpty().WithMessage("Password is mandatory.")
+    .Custom(ValidatePassword);
+    ...
+    </code></pre>
+    <li>No automatic validation</li>
+    <li>Dependency Injection: use of built-in .Net Core DI with service interfaces and service implementations</li>
+    <pre><code class="Csharp">
+    public UserApiController(BalticAmadeusTaskContext context, IPasswordPolicyService passwordPolicyService, IHashingService hashingService)
+    {
+    </code></pre>
+    <li>Services: HashingService, PasswordPolicyService, CRUDApiConfig</li>
+    <li>AutoMapper for basic model mappings</li>
+    <li>Usage of Middleware</li>
+</ul>
+
+<h3>Front-End: </h3>
+<ul>
+    <li>ASP.Net core 2.1 ASP MVC with Razor Engine</li>
+    <li>Responsibility: Web UI to Display Users list, to display User information and create a new User</li>
+    <li>Use Back-end API to Perform CRUD operations</li>
+
+</ul>
+
+<h3>DB: </h3>
+<ul>
+    <li>SQL Express 2017</li>
+    <li>Connection string in appsetting.json.</li>
+    <li>Table needs to be created manually</li>
+    <pre><code class="language-sql">
+                 CREATE TABLE RegisteredUser (
+    <span class="hljs-attr">
+                     ID UNIQUEIDENTIFIER DEFAULT NEWSEQUENTIALID() PRIMARY KEY,
+                     Name varchar(50),
+                     Email varchar(50),
+                     DateOfBirth DATE,
+                     Password varchar(255),
+                     AdditionalInfo varchar(1024),
+                     CONSTRAINT AK_Email UNIQUE(Email)
+                 </span>
+                 );
+    </code></pre>
+</ul>
+
+<h3>Unit Testing: </h3>
+<ul>
+    <li>XUnit</li>
+    <li>Mocking with Moq</li>
+    <li>Fake classes</li>
+    <li>ORM: .Net in-Memory instead of EF</li>
+    <li>Testing of API functionalities</li>
+</ul>
+
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+

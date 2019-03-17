@@ -1,0 +1,43 @@
+﻿@model BalticAmadeusTask.Models.RegisteredUser
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Registered User</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DateOfBirth)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DateOfBirth)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AdditionalInfo)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AdditionalInfo)
+        </dd>
+
+    </dl>
+</div>
+<div>
+    <!-- <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> | -->
+    Edit | <a asp-action="Index">Back to List</a>
+</div>
